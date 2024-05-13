@@ -16,6 +16,9 @@ program Contract_Main
     call random_number(B)
     C(:,:) = 0.0
 
+    ! Copies A, B and C to the GPU and then perform the contraction
+    ! specified with Einstein summation. The result tensor C is then
+    ! copied back to host memory
     call contract(C,A,B,'C(a,b)=A(a,c)*B(c,b)')
     
     write (*,*) 'A = '
