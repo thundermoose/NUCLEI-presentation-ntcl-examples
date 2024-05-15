@@ -40,8 +40,7 @@ contains
         end if
         actual_stream = c_null_ptr
         if (present(astream)) actual_stream = astream%sid
-        !converter = converter_factory%get_c_pointer_converter("device")
-        converter = converter_factory%get_c_pointer_converter("host")
+        converter = converter_factory%get_c_pointer_converter("device")
         call converter%secure_pointer(dst, dst_ptr, astream)
         call converter%secure_pointer(src, src_ptr, astream)
         call my_gpu_callback(dst_ptr, src_ptr, src%get_number_of_elements(), actual_stream)
@@ -62,7 +61,7 @@ program Custom_GPU_Kernel_Main
     use :: Custom_GPU_Kernel_module, only : call_gpu_callback
     implicit none
 
-    integer, parameter :: side = 4
+    integer, parameter :: side = 1000
     class(tensor), allocatable :: tensor_dst, tensor_src
     real(real64), dimension(side,side) :: src
     real(real64), dimension(:,:), contiguous, pointer :: dst_data
@@ -73,20 +72,16 @@ program Custom_GPU_Kernel_Main
         do col_idx = 1, side
             src(row_idx,col_idx) = 1.0*((row_idx-1)*side + col_idx-1) 
         end do
-        write(*,*) src(row_idx,:)
     end do
     
-    call allocate_and_copy_tensor(tensor_src, src, memory_type='host')
-    call allocate_and_create_tensor(tensor_dst, [side, side], memory_type='host')
+    call allocate_and_copy_tensor(tensor_src, src, memory_type='device')
+    call allocate_and_create_tensor(tensor_dst, [side, side], memory_type='device')
 
-    call call_gpu_callback(tensor_dst, tensor_dst)
+    call call_gpu_callback(tensor_dst, tensor_src)
 
-    call secure_fortran_pointer_from_tensor(dst_data, tensor_src)
-    do row_idx = 1, side
-        write(*,*) dst_data(row_idx,:)
-    end do
+    call secure_fortran_pointer_from_tensor(dst_data, tensor_dst)
     write (*,*) 'Pi: ', sqrt(6*sum(dst_data))
-    call release_pointer_from_remote_tensor(dst_data, tensor_src)
+    call release_pointer_from_remote_tensor(dst_data, tensor_dst)
     call tensor_src%cleanup()
     call tensor_dst%cleanup()
     deallocate(tensor_src)
