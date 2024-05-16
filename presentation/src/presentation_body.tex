@@ -1,0 +1,57 @@
+\section{Background}
+\begin{frame}
+	\frametitle{NTCL}
+	% Introducing NTCL, why and what it is
+\end{frame}
+\section{Example replacing dgemm}
+\begin{frame}[fragile]
+	\frametitle{Example: gemm interface}
+	\begin{lstlisting}
+    real(real64), dimension(10,10) :: A
+    real(real64), dimension(10,10) :: B
+    real(real64), dimension(10,10) :: C
+    ! Popluate arrays with random values
+    call random_number(A)
+    call random_number(B)
+    C(:,:) = 0.0
+    ! Perform a matrix-matrix multiplication 
+    ! using BLAS dgemm
+    call dgemm('N', 'N', 10, 10, 10, 1.0D0, A, &
+               10, B, 10, 0.0D0, C, m)
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Example: gemm interface}
+	\begin{lstlisting}
+    use :: algorithms_initializer, only : &
+           algorithms_initialize, &
+           algorithms_finalize
+    use :: algorithms_api, only : &
+           dgemm=>ntcl_gemm_real64
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Example: gemm interface}
+	\begin{lstlisting}
+    call algorithms_initialize()
+    ! Popluate arrays with random values
+    call random_number(A)
+    call random_number(B)
+    C(:,:) = 0.0
+    ! Perform a matrix-matrix multiplication 
+    ! using BLAS dgemm
+    call dgemm('N', 'N', 10, 10, 10, 1.0D0, A, &
+               10, B, 10, 0.0D0, C, m)
+    call algorithms_finalize()
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Example: easy-contraction interface}
+\end{frame}
+\begin{frame}
+	\frametitle{Example: NTCL-tensors}
+\end{frame}
+
