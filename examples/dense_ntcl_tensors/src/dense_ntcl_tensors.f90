@@ -23,8 +23,6 @@ program Dense_NTCL_Tensors
     call random_number(B)
     C(:,:) = 0.0
 
-    ! Setting up the tensor contraction
-    call tensor_contraction_factory%create(my_contraction, 'C(a,b)=A(a,c)*B(c,b)')
 
     ! Copying tensors to GPU
     call allocate_and_copy_tensor(tensor_A, A)
@@ -32,6 +30,9 @@ program Dense_NTCL_Tensors
     call allocate_and_copy_tensor(tensor_C, C)
 
     
+    ! Setting up the tensor contraction
+    call tensor_contraction_factory%create(my_contraction, 'C(a,b)=A(a,c)*B(c,b)')
+
     ! Performing tensor contraction on GPU
     call my_contraction%contract(tensor_C, tensor_A, tensor_B)
     ! ... potentially many different contractions
